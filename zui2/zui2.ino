@@ -3,43 +3,35 @@
  Created:	2018/9/3 23:04:12
  Author:	zanllp
 */
+
 #include<avr/pgmspace.h>
-// the setup function runs once when you press reset or power the board
-
-
-
-
 
 
 /*******************数据**************************/
-int RST;
-int CE;
-int DC;
-int DIN;
-int CLK;
-int cursor_pos[20][2];//存放当前页面所有光标的坐标
-int cursor_num;//当前页面的光标数量
-int cursor_num_temp;
-int cursor_now = 1;//存放当前光标在当前页面的位数
-int cursor_now_temp;
-int page_now;//当前页面编号
-int page_now_temp;
-int page_last = 1;//上个页面编号
-double number_temp;//消息框数据修改的缓存
-unsigned time_temp;
-boolean arrow_state;
-boolean first_record;//是否为当前页面首次记录光标位置
-boolean page_arrow=true;//当前页面是否使用箭头作为光标指示
-int key = 12;//ps2摇杆的按键
-int vertical_input = A0;//纵向选项电位器输入
-int horiziontal_input = A1; //横向选项电位器输入
-int limit_high = 600;//读取电位器模拟值的上限，超过时触发
-int limit_low = 400;//下限
-const char decimal_point[]PROGMEM = { 0x00, 0x40, }; //小数点
-const char arrow[2][16]PROGMEM = { { 0x00, 0x00, 0x00, 0x80, 0x40, 0x20, 0x10, 0x08, 0x08, 0x10, 0x20, 0x40, 0x80, 0x00, 0x00, 0x00, },
-{ 0x00, 0x00, 0x00, 0x20, 0x10, 0x08, 0x04, 0x02, 0x02, 0x04, 0x08, 0x10, 0x20, 0x00, 0x00, 0x00, }
-};
-const char frame[]PROGMEM = { 0xFF, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03,
+static int RST;
+static int CE;
+static int DC;
+static int DIN;
+static int CLK;
+static int cursor_pos[20][2];//存放当前页面所有光标的坐标
+static int cursor_num = 0;//当前页面的光标数量
+static int cursor_num_temp;
+static int cursor_now = 1;//存放当前光标在当前页面的位数
+static int cursor_now_temp;
+static int page_now = 0;//当前页面编号
+static int page_now_temp;
+static int page_last = 1;//上个页面编号
+static unsigned time_temp;
+static boolean arrow_state;
+static boolean first_record;//是否为当前页面首次记录光标位置
+static boolean page_arrow = true;//当前页面是否使用箭头作为光标指示
+static int key = 12;//ps2摇杆的按键
+static int vertical_input = A0;//纵向选项电位器输入
+static int horiziontal_input = A1; //横向选项电位器输入
+static int limit_high = 600;//读取电位器模拟值的上限，超过时触发
+static int limit_low = 400;//下限
+static const char decimal_point[]PROGMEM = { 0x00, 0x40, }; //小数点
+static const char frame[]PROGMEM = { 0xFF, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03,
 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03,
 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03,
 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0xFF, 0xFF, 0x00, 0x00, 0x00,
@@ -56,10 +48,10 @@ const char frame[]PROGMEM = { 0xFF, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x
 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0xFF,
 
 };
-const char ASCIIDZ[67] = " !:abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.";
-char char_conver_temp[112];//字符转换缓存
-const char xz[8] PROGMEM = { 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, };//用到的地方不多就不重写名字了
-const char ASCII[92][6]PROGMEM = {
+static const char ASCIIDZ[67] = " !:abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.";
+static char char_conver_temp[112];//字符转换缓存
+static const char xz[8] PROGMEM = { 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, };//用到的地方不多就不重写名字了
+static const char ASCII[92][6]PROGMEM = {
 	{ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },   // sp
 	{ 0x00, 0x00, 0x00, 0x2f, 0x00, 0x00 },   // !
 	{ 0x00, 0x00, 0x07, 0x00, 0x07, 0x00 },   // "
@@ -153,10 +145,14 @@ const char ASCII[92][6]PROGMEM = {
 	{ 0x00, 0x44, 0x64, 0x54, 0x4C, 0x44 },   // z
 	{ 0x14, 0x14, 0x14, 0x14, 0x14, 0x14 },    // horiz lines
 };
-const char cursor_arrow[6]PROGMEM = { 0x10, 0x10, 0x10, 0x54, 0x38, 0x10 };//箭头样式的光标
-//const char null[6]PROGMEM = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };//空
-
-/*********************函数***********************/
+static const char cursor_arrow[6]PROGMEM = { 0x10, 0x10, 0x10, 0x54, 0x38, 0x10 };//箭头样式的光标
+///设置ps2摇杆的连接的针脚   按键，纵向选项电位器输入，横向选项电位器输入
+void PS2Set(int _key, int _vertical_input, int _horiziontal_input)
+{
+	key = _key;
+	vertical_input = _vertical_input;
+	horiziontal_input = _horiziontal_input;
+}
 
 //LCD初始化函数
 void LcdInit(int RST0, int CE0, int DC0, int DIN0, int CLK0)
@@ -288,7 +284,7 @@ void Var(int x, int y, double number, int b, boolean  float_number = 0, bool rev
 
 	if (float_number)//浮点数
 	{
-		if (number< 0)//负号
+		if (number < 0)//负号
 		{
 			number = -number;
 			Draw(x, y, 6, 8, ASCII[13], reverse_display);
@@ -312,7 +308,7 @@ void Var(int x, int y, double number, int b, boolean  float_number = 0, bool rev
 				Draw(int(x + 6 * i), y, 6, 8, ASCII[char(u16((number - z) / (pow(10, xs - (i + 1))) + 16))], reverse_display);
 			}
 			if (i > xs)//小数点后面的数字
-			{			
+			{
 				double z = u16((number - int(number)) * pow(10, (i - xs - 1))) / pow(10, (i - xs - 1));
 				Draw(int(x + 6 * i - 4), y, 6, 8, ASCII[char(int((number - int(number) - z) * (pow(10, (i - xs))) + 16))], reverse_display);
 			}
@@ -420,7 +416,7 @@ void Text(int x, int y, char* l, boolean reverse_display = 0)
 //点击        button_now当前按钮是这个页面的第几个按钮，ps2摇杆的按键按下时返回true
 boolean Click(int button_now)
 {
-	if (!digitalRead(key)&&cursor_now==button_now)//ps2摇杆在按下时是断开
+	if (!digitalRead(key) && cursor_now == button_now)//ps2摇杆在按下时是断开
 	{
 		return true;
 	}
@@ -430,7 +426,7 @@ boolean Click(int button_now)
 	}
 }
 //变量按钮    xy坐标，number变量，b要打印出多少位，float_number是否为浮点数
-void ButtonVar(int x, int y, double number, int b,boolean float_number = 0) //光标标注,注册选项,保存各个光标的坐标
+void ButtonVar(int x, int y, double number, int b, boolean float_number = 0) //光标标注,注册选项,保存各个光标的坐标
 {
 	if (page_last != page_now)//切换了页面
 	{
@@ -499,10 +495,113 @@ void ButtonText(int x, int y, char *l)//光标标注,注册选项,保存各个光标的坐标
 		}
 	}
 }
+//数据更改对话框   number被修改的数据，b要打印出几位数，时候为浮点，每50ms步进程度
+void MsgBox(double &number, int b, boolean float_num, float range)//number要修改的数据，b数据的有效数位，c是否浮点数，range每隔50ms变动的幅度
+{//arduino好像不能用模板，提示 error: 'T' was not declared in this scope
+	int cursor_now_0 = cursor_now;
+	int cursor_num_0 = cursor_num;
+	int page_now_0 = page_now;
+	delay(10);
+	Clear();
+	double number_temp = number;
+	Draw(12, 1, 60, 32, frame);
+	page_now = 255;//数据框修改，没有像ui()这个这个函数来分配页面编号，必须手动指出，不然按钮的坐标和数量不会更新
+	while (1)
+	{
+		delay(50);
+		Var(30, 2, number_temp, b, float_num);
+		if (analogRead(horiziontal_input) > limit_high)
+		{
+			number_temp += range;
+			Draw(12, 1, 60, 32, frame);
+			delay(50);
+		}
+		if (analogRead(horiziontal_input) < limit_low)
+		{
+			number_temp -= range;
+			Draw(12, 1, 60, 32, frame);
+			delay(50);
+		}
+		ButtonText(25, 4, "YES");
+		ButtonText(50, 4, "NO");
+		if (Click(0))//第0个按钮按下
+		{
+			cursor_now = cursor_now_0;
+			cursor_num = cursor_num_0;
+			page_now = page_now_0;
+			Clear();
+			number = number_temp;
+			break;
+		}
+		if (Click(1))
+		{
+			cursor_now = cursor_now_0;
+			cursor_num = cursor_num_0;
+			page_now = page_now_0;
+			Clear();
+			break;
+		}
+		ReverseDisplayEnd();
+	}
 
+}
+void MsgBox(int &number, int b, boolean float_num, float range)//number要修改的数据，b数据的有效数位，c是否浮点数，range每隔50ms变动的幅度
+{
+	int cursor_now_0 = cursor_now;
+	int cursor_num_0 = cursor_num;
+	int page_now_0 = page_now;
+	delay(10);
+	Clear();
+	int number_temp = number;
+	Draw(12, 1, 60, 32, frame);
+	page_now = 255;//数据框修改，没有像ui()这个这个函数来分配页面编号，必须手动指出，不然按钮的坐标和数量不会更新
+	while (1)
+	{
+		delay(50);
+		Var(30, 2, number_temp, b, float_num);
+		if (analogRead(horiziontal_input) > limit_high)
+		{
+			number_temp += range;
+			Draw(12, 1, 60, 32, frame);
+			delay(50);
+		}
+		if (analogRead(horiziontal_input) < limit_low)
+		{
+			number_temp -= range;
+			Draw(12, 1, 60, 32, frame);
+			delay(50);
+		}
+		ButtonText(25, 4, "YES");
+		ButtonText(50, 4, "NO");
+		if (Click(0))//第0个按钮按下
+		{
+			cursor_now = cursor_now_0;
+			cursor_num = cursor_num_0;
+			page_now = page_now_0;
+			number = number_temp;
+			Clear();
+			break;
+		}
+		if (Click(1))
+		{
+			cursor_now = cursor_now_0;
+			cursor_num = cursor_num_0;
+			page_now = page_now_0;
+			Clear();
+			break;
+		}
+		Serial.println(cursor_now + "1");
+		ReverseDisplayEnd();
+	}
+
+}
 //页面结束使用箭头作为光标指示
 void ArrowEnd()
 {
+	if (!page_arrow)
+	{
+		Clear();
+	}
 	page_arrow = true;//当前页面是箭头
 	if (analogRead(vertical_input) > limit_high)
 	{
@@ -526,7 +625,10 @@ void ArrowEnd()
 	{
 		Draw(cursor_pos[cursor_now][0], cursor_pos[cursor_now][1], 6, 8, cursor_arrow);
 	}
-	ButtonText(54, 5, "home");//右下角回家按钮
+	if (page_now != 0) //主页不需要home键
+	{
+		ButtonText(54, 5, "home");//回家按钮
+	}
 	page_last = page_now;
 	if (Click(cursor_num - 1))
 	{
@@ -536,6 +638,10 @@ void ArrowEnd()
 //页面结束使用反显作为光标指示
 void ReverseDisplayEnd()//反显移动
 {
+	if (page_arrow)
+	{
+		Clear();//使用箭头会让这个控件推后6像素，因为控件是先绘制再指示光标样式，所以使用反显的时候可能会残留箭头样式遗留下来的几个像素，刷新就行
+	}
 	page_arrow = false;//当前页面不是箭头
 	if (analogRead(vertical_input) > limit_high)
 	{
@@ -553,7 +659,7 @@ void ReverseDisplayEnd()//反显移动
 			cursor_now = cursor_num - 1;
 		}
 	}
-	if (page_now != 0 && page_now != 255) //主页，提示框不需要hmoe键
+	if (page_now != 0) //主页，提示框不需要home键
 	{
 		ButtonText(60, 5, "home");
 	}
@@ -562,8 +668,8 @@ void ReverseDisplayEnd()//反显移动
 	{
 		page_now = 0;
 	}
-	//delay(100);
 }
+
 
 
 /***********************************这些是图片****************************************************/
@@ -740,21 +846,23 @@ const char arduino[]PROGMEM = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x80, 
 const char kmh[]PROGMEM = { 0x1F, 0x04, 0x1A, 0x00, 0x1E, 0x02, 0x1C, 0x02, 0x1E, 0x00, 0xF8, 0x20, 0xE0, }; //km/h
 const char ssd[]PROGMEM = { 0x02, 0x05, 0x72, 0x88, 0x88, 0x88, }; //摄氏度
 const char wd[10]PROGMEM = { 0x01, 0x01, 0x7F, 0x01, 0x39, 0x54, 0x48, 0x00, 0x6C, 0x6C, };//温度
-/*************************************************************************************************/
 
-/*****************私有***********************/
+const char arrow[2][16]PROGMEM = { { 0x00, 0x00, 0x00, 0x80, 0x40, 0x20, 0x10, 0x08, 0x08, 0x10, 0x20, 0x40, 0x80, 0x00, 0x00, 0x00, },
+{ 0x00, 0x00, 0x00, 0x20, 0x10, 0x08, 0x04, 0x02, 0x02, 0x04, 0x08, 0x10, 0x20, 0x00, 0x00, 0x00, }
+};
+/*************************************************************************************************/
 
 boolean ch5;
 int ch6 = analogRead(A2);
 boolean ch7;//第七通道
 boolean ch8;
-float recv = 11.1;//接收机电压初始值11.1v
+double recv = 11.1;//接收机电压初始值11.1v
 int speed;//速度
-float heigDraw;//高度
+double heigDraw;//高度
 unsigned int wxsl;//卫星数量
-float temp = 24.0;//温度
+double temp = 28.0;//温度
 int afcs;//飞控状态
-float jgdy = 3.6; //报警电压
+double jgdy = 3.6; //报警电压
 int pwm = 920;
 /*************************开机界面*****************************/
 void kjjm(int time)
@@ -768,7 +876,7 @@ void kjjm(int time)
 	Clear();
 }
 /*******************滑动选项***************************/
-void hd_yd(/*,char* tb ,char* bt*/)
+void hd_yd()
 {
 
 	cursor_num = sizeof(icon) / 128;
@@ -821,59 +929,7 @@ void hd_yd(/*,char* tb ,char* bt*/)
 	page_last = page_now;
 
 }
-/**********************数据更改对话框****（被修改的数据，有效数位，整数/浮点，每50ms步进程度）*****/
-double MsgBox(double number, int b, boolean float_num, float range)//number要修改的数据，b数据的有效数位，c是否浮点数，range每隔50ms变动的幅度
-{
-	cursor_now_temp = cursor_now;
-	page_now_temp = page_now;
-	cursor_num_temp = cursor_num;
-	page_last = page_now;
-	page_now = 255;
-	delay(10);
-	Clear();
-	number_temp = number;
-	Draw(12, 1, 60, 32, frame);
-	while (1)
-	{
-		delay(50);
-		Var(30, 2, number_temp, b, float_num);
-		if (analogRead(horiziontal_input) > limit_high)
-		{
-			number_temp += range;
-			Draw(12, 1, 60, 32, frame);
-			delay(50);
 
-		}
-		if (analogRead(horiziontal_input) < limit_low)
-		{
-			number_temp -= range;
-			Draw(12, 1, 60, 32, frame);
-			delay(50);
-		}
-		ButtonText(25, 4, "YES");
-		ButtonText(50, 4, "NO");
-		ReverseDisplayEnd();
-		if (Click(0))
-		{
-			cursor_now = cursor_now_temp;
-			cursor_num = cursor_num_temp;
-			page_now = page_now_temp;
-			Clear();
-			return number_temp;
-
-		}
-
-		if (Click(1))
-		{
-			cursor_now = cursor_now_temp;
-			cursor_num = cursor_num_temp;
-			page_now = page_now_temp;
-			Clear();
-			return number;
-		}
-	}
-
-}
 /*************************************************************/
 
 //                         页面
@@ -895,35 +951,34 @@ void UI()//页面数量
 		Clear();
 	}
 	/***************根据页面编号进行切换****************/
-	switch (page_now)//页面切换
+	switch (page_now)//页面切换，分配页面编号
 	{
+	case 0:
+		home();//主页
+		break;
 	case 1:
 		menu();//菜单
 		break;
 	case 2:
-
 		battery();//电池
 		break;
 	case 4:
-
 		range();//行程
 		break;
 	case 5:
 
 		fan();//行程
 		break;
-	case 0:
-		home();//主页
-		break;
-
-	default:
+	default://默认相当于没分配页面编号
+		page_now = 0;//必须指出home的页面编号为0，不然出现home键
 		home();//主页
 		break;
 	}
 }
 
 /*********************************主页***********************************/
-void home() {
+void home()
+{
 	/***********第一行**************/
 	Text(0, 0, "CH5:", 0);
 	if (ch5 == 1)
@@ -1047,10 +1102,9 @@ void range(void)//电位器行程，页面编号为4
 	Var(50, 4, digitalRead(A4), 1, 0);//上
 	Var(60, 4, digitalRead(A5), 1, 0);//下
 	ButtonVar(60, 0, jgdy, 2, 1);
-	if (Click(5))//当光标位置为0，按键按下时
+	if (Click(5))//当光标位置为5，按键按下时
 	{
 		MsgBox(jgdy, 2, 1, 0.1);//返回修改的数据,打开对话框修改数据（被修改的数据，有效数位，整数/浮点，每50ms步进程度）
-		UI();//在从对话框切回时，光标数量未能正确计算，修复无果，因而重新进入页面。因为保留了光标位置和页面编号所以光标位置不变。
 	}
 	ArrowEnd();//当前页面使用光标,使用纵向电位器对面光标进行控制,必须放在页面末尾
 }
@@ -1066,7 +1120,6 @@ void battery()//页面编号为2
 	if (Click(0))//当光标位置为0，按键按下时
 	{
 		MsgBox(jgdy, 2, 1, 0.1);//返回修改的数据,打开对话框修改数据（被修改的数据，有效数位，整数/浮点，电位器活动时每50ms0.1）
-		UI();//在从对话框切回时，光标数量未能正确计算，修复无果，因而重新进入页面。因为保留了光标位置和页面编号所以光标位置不变。
 	}
 	Text(78, 1, "v", 0);
 	/*******************/
@@ -1078,7 +1131,6 @@ void battery()//页面编号为2
 	if (Click(1))//当光标位置为0，按键按下时
 	{
 		MsgBox(recv, 3, 1, 0.5); //返回修改的数据,打开对话框修改数据（被修改的数据，有效数位，整数/浮点，电位器活动时每50ms0.5）
-		UI();//在从对话框切回时，光标数量未能正确计算，修复无果，因而重新进入页面。因为保留了光标位置和页面编号所以光标位置不变。
 	}
 	Text(78, 4, "v", 0);
 	ReverseDisplayEnd();//页面结束当前页面使用反显
@@ -1086,32 +1138,23 @@ void battery()//页面编号为2
 }
 void fan()
 {
-	Var(0, 2, pwm, 4, 0,1);
+	ButtonVar(0, 2, pwm, 4, 0);
 	if ( Click(0))
 	{
 		MsgBox(pwm, 4, 0, 50);
-		UI();
 	}
 	ReverseDisplayEnd();
-}
-/****************数据探针************************/
-void softpwm(int gpio, int  pwm)
-{
-	pwm = constrain(pwm, 920, 2120);
-	digitalWrite(gpio, 1);
-	delayMicroseconds(pwm);
-	digitalWrite(gpio, 0);
-	delay(19);
 }
 void setup()
 {
 	LcdInit(6, 7, 5, 4, 3);//rst,ce,dc,din,clk
+	PS2Set(12, A0, A1);//用于控制界面的ps2摇杆的按键，纵向选项电位器针脚，横向选项电位器针脚
 	kjjm(1000);//开机界面,持续时间1000ms
-	Serial.begin(115200);
+	Serial.begin(9600);
 }
 
 void loop()
 {
 	UI();//启动界面
-	softpwm(2, pwm);
+	Serial.println(page_now);
 }
