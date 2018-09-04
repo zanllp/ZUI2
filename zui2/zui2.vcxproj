@@ -42,7 +42,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>C:\Users\w1598\source\repos\zui2\zui2\__vm;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Users\w1598\source\repos\zui2\zui2;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -79,7 +79,7 @@
     <DebuggerFlavor>VisualMicroDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>C:\Users\w1598\source\repos\zui2\zui2\__vm;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Users\w1598\source\repos\zui2\zui2;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemGroup>
     <None Include="zui2.ino">
@@ -88,12 +88,13 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="__vm\.zui2.vsarduino.h" />
-    <ClInclude Include="zuilcd5110.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="zuilcd5110.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
+  <ProjectExtensions>
+    <VisualStudio>
+      <UserProperties vm.upload.useprogrammer="0" />
+    </VisualStudio>
+  </ProjectExtensions>
 </Project>
