@@ -529,8 +529,10 @@ void MsgBox(double &number, int b, boolean float_num, float range)//numberÒªÐÞ¸Ä
 			cursor_now = cursor_now_0;
 			cursor_num = cursor_num_0;
 			page_now = page_now_0;
+			page_last = 255;
 			Clear();
 			number = number_temp;
+			UI();
 			break;
 		}
 		if (Click(1))
@@ -538,7 +540,9 @@ void MsgBox(double &number, int b, boolean float_num, float range)//numberÒªÐÞ¸Ä
 			cursor_now = cursor_now_0;
 			cursor_num = cursor_num_0;
 			page_now = page_now_0;
+			page_last = 255;
 			Clear();
+			UI();
 			break;
 		}
 		ReverseDisplayEnd();
@@ -580,6 +584,7 @@ void MsgBox(int &number, int b, boolean float_num, float range)//numberÒªÐÞ¸ÄµÄÊ
 			page_now = page_now_0;
 			number = number_temp;
 			Clear();
+			UI();
 			break;
 		}
 		if (Click(1))
@@ -588,6 +593,7 @@ void MsgBox(int &number, int b, boolean float_num, float range)//numberÒªÐÞ¸ÄµÄÊ
 			cursor_num = cursor_num_0;
 			page_now = page_now_0;
 			Clear();
+			UI();
 			break;
 		}
 		Serial.println(cursor_now + "1");
