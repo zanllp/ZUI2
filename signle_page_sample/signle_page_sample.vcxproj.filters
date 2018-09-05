@@ -15,20 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <None Include="zui2.ino" />
     <None Include="signle_page_sample.ino" />
   </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="__vm\.zui2.vsarduino.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zui_lcd5110.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="zui_lcd5110.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-  </ItemGroup>
+ 
 </Project>
