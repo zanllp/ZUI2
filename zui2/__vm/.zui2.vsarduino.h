@@ -77,6 +77,5 @@ typedef void *__builtin_va_list;
 #define pgm_read_ptr(address_short)   short()
 
 #include "zui2.ino"
-#include "signle_page_sample.ino"
 #endif
 #endif

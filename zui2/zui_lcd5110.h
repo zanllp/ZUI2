@@ -26,6 +26,8 @@ public:
 	boolean PS2VRYUp();
 	//如果ps2的y摇杆向下，返回true.   
 	boolean PS2VRYDown();
+	//设置ps2摇杆控制光标的延时  _delay延长的时间单位ms   默认50
+	void SetPS2Delay(int _delay);
 
 
 	//LCD初始化函数
@@ -79,6 +81,8 @@ public:
 	void PageAsyc();
 	//如果切换了页面    返回ture
 	boolean PageSwitch();
+	//到另一个页面 _page要到页面的页面编号
+	void ToPage(int _page);
 private:
 	/*******************数据**************************/
 	static int RST;
@@ -86,7 +90,7 @@ private:
 	static int DC;
 	static int DIN;
 	static int CLK;
-	static int cursor_pos[20][2];//存放当前页面所有光标的坐标
+	static int cursor_pos;//记录cpu执行到那个坐标
 	static int cursor_num;//当前页面的光标数量
 	static int cursor_num_temp;
 	static int cursor_now ;//存放当前光标在当前页面的位数
@@ -101,6 +105,8 @@ private:
 	static int vry_input; //ps2的vrx电位器
 	static int limit_high;//读取电位器模拟值的上限，超过时触发
 	static int limit_low;//下限
+	static int PS2_delay;//ps2摇杆超出极限时的延时
+	static boolean sync;//是否进行同步
 	static const char decimal_point[]PROGMEM ; //小数点
 	static const char frame[]PROGMEM ;
 	static const char ASCIIDZ[67];

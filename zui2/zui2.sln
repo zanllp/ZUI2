@@ -5,6 +5,8 @@ VisualStudioVersion = 15.0.28010.2016
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "zui2", "zui2.vcxproj", "{C5F80730-F44F-4478-BDAE-6634EFC2CA88}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "示例", "..\示例\示例.vcxproj", "{DDDC03C0-4908-4F9B-8E50-37525DDE648A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
@@ -15,6 +17,10 @@ Global
 		{C5F80730-F44F-4478-BDAE-6634EFC2CA88}.Debug|x86.Build.0 = Debug|Win32
 		{C5F80730-F44F-4478-BDAE-6634EFC2CA88}.Release|x86.ActiveCfg = Release|Win32
 		{C5F80730-F44F-4478-BDAE-6634EFC2CA88}.Release|x86.Build.0 = Release|Win32
+		{DDDC03C0-4908-4F9B-8E50-37525DDE648A}.Debug|x86.ActiveCfg = Debug|Win32
+		{DDDC03C0-4908-4F9B-8E50-37525DDE648A}.Debug|x86.Build.0 = Debug|Win32
+		{DDDC03C0-4908-4F9B-8E50-37525DDE648A}.Release|x86.ActiveCfg = Release|Win32
+		{DDDC03C0-4908-4F9B-8E50-37525DDE648A}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

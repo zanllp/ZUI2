@@ -10,7 +10,7 @@ int zui::CE;
 int zui::DC;
 int zui::DIN;
 int zui::CLK;
-int zui::cursor_pos[20][2];//´æ·Åµ±Ç°Ò³ÃæËùÓĞ¹â±êµÄ×ø±ê
+int zui::cursor_pos=0;//¼ÇÂ¼cpuÖ´ĞĞµ½ÄÇ¸ö×ø±ê
 int zui::cursor_num = 0;//µ±Ç°Ò³ÃæµÄ¹â±êÊıÁ¿
 int zui::cursor_num_temp;
 int zui::cursor_now = 1;//´æ·Åµ±Ç°¹â±êÔÚµ±Ç°Ò³ÃæµÄÎ»Êı
@@ -25,6 +25,8 @@ int zui::vrx_input = A0;//ps2µÄvrxµçÎ»Æ÷ÊäÈë
 int zui::vry_input = A1; //ps2µÄvryµçÎ»Æ÷ÊäÈë
 int zui::limit_high = 650;//¶ÁÈ¡µçÎ»Æ÷Ä£ÄâÖµµÄÉÏÏŞ£¬³¬¹ıÊ±´¥·¢
 int zui::limit_low = 350;//ÏÂÏŞ
+int zui::PS2_delay = 50;
+boolean zui::sync = true;
 const char zui::decimal_point[]PROGMEM = { 0x00, 0x40, }; //Ğ¡Êıµã
 const char zui::frame[]PROGMEM = { 0xFF, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03,
 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03,
@@ -163,22 +165,48 @@ void zui::SetTrigLimit(int _limit_high, int _limit_low)
 //Èç¹ûps2µÄvrxÒ¡¸ËÏòÉÏ£¬·µ»Øtrue.      £¨È¡ÃûÊÇ±à³Ì×îÀ§ÄÑµÄ¹¤×÷Ö®Ò»£©
 boolean zui::PS2VRXUp()
 {
-	return analogRead(vrx_input) > limit_high;
+	if (analogRead(vrx_input) > limit_high)
+	{
+		delay(PS2_delay);
+		return true;
+	}
+	return false;
+	
 }
 //Èç¹ûps2µÄvrxÒ¡¸ËÏòÏÂ£¬·µ»Øtrue.   
 boolean zui::PS2VRXDown()
 {
-	return analogRead(vrx_input) < limit_low;
+	if (analogRead(vrx_input) < limit_low)
+	{
+		delay(PS2_delay);
+		return true;
+	}
+	return false;
 }
 //Èç¹ûps2µÄvryÒ¡¸ËÏòÉÏ£¬·µ»Øtrue.   
 boolean zui::PS2VRYUp()
 {
-	return analogRead(vry_input) > limit_high;
+	if (analogRead(vry_input) > limit_high)
+	{
+		delay(PS2_delay);
+		return true;
+	}
+	return false;
 }
 //Èç¹ûps2µÄvryÒ¡¸ËÏòÏÂ£¬·µ»Øtrue.   
 boolean zui::PS2VRYDown()
 {
-	return analogRead(vry_input) < limit_low;
+	if (analogRead(vry_input) < limit_low)
+	{
+		delay(PS2_delay);
+		return true;
+	}
+	return false;
+}
+//ÉèÖÃps2Ò¡¸Ë¿ØÖÆ¹â±êµÄÑÓÊ± _delayÑÓ³¤µÄÊ±¼äµ¥Î»ms Ä¬ÈÏ50
+void zui::SetPS2Delay(int _delay)
+{
+	PS2_delay = _delay;
 }
 
 
@@ -465,8 +493,6 @@ void zui::ButtonVar(int x, int y, double number, int b, boolean float_number = 0
 			first_record = 1;
 		}
 		cursor_num++;
-		cursor_pos[cursor_num - 1][0] = x;
-		cursor_pos[cursor_num - 1][1] = y;
 	}
 	else
 	{
@@ -474,12 +500,16 @@ void zui::ButtonVar(int x, int y, double number, int b, boolean float_number = 0
 	}
 	if (page_arrow)//Èç¹ûÕâ¸öÒ³ÃæÊ¹ÓÃµÄÊÇ¼ıÍ·×÷Îª¹â±ê±êÊ¶
 	{
+		if (cursor_now == cursor_pos)
+		{
+			Draw(x, y, 6, 8, cursor_arrow);
+		}
 		x += 6;//¹â±êÕ¼ÓÃ6¸öÏñËØ
 		Var(x, y, number, b, float_number);
 	}
 	else//·´ÏÔ
 	{
-		if (x == cursor_pos[cursor_now][0] && y == cursor_pos[cursor_now][1])//·ûºÏµ±Ç°¹â±ê×ø±êµÄ·´ÏÔÊä³ö£¬²»·ûºÏµÄÕı³£Êä³ö
+		if (cursor_pos==cursor_now)//·ûºÏµ±Ç°¹â±ê×ø±êµÄ·´ÏÔÊä³ö£¬²»·ûºÏµÄÕı³£Êä³ö
 		{
 			Var(x, y, number, b, float_number, 1);
 		}
@@ -488,20 +518,19 @@ void zui::ButtonVar(int x, int y, double number, int b, boolean float_number = 0
 			Var(x, y, number, b, float_number);
 		}
 	}
+	cursor_pos++;//cpuÖ´ĞĞµ½µÚ¼¸¸ö×ø±ê
 }
 //ÎÄ±¾°´Å¥    xy×ø±ê£¬l×Ö·û´®
 void zui::ButtonText(int x, int y, char *l)//¹â±ê±ê×¢,×¢²áÑ¡Ïî,±£´æ¸÷¸ö¹â±êµÄ×ø±ê
 {
 	if (PageSwitch())
 	{
-		if (first_record == 0)
+		if (first_record == 0)//Ê×´Î¼ÇÂ¼ĞèÒª½«¹â±êÊıÁ¿ÖÃ0
 		{
 			cursor_num = 0;
 			first_record = 1;
 		}
 		cursor_num++;
-		cursor_pos[cursor_num - 1][0] = x;
-		cursor_pos[cursor_num - 1][1] = y;
 	}
 	else
 	{
@@ -509,13 +538,18 @@ void zui::ButtonText(int x, int y, char *l)//¹â±ê±ê×¢,×¢²áÑ¡Ïî,±£´æ¸÷¸ö¹â±êµÄ×ø±
 	}
 	if (page_arrow)
 	{
+		if (cursor_now==cursor_pos)
+		{
+			Draw(x, y, 6, 8, cursor_arrow);
+		}
 		x += 6;
 		Text(x, y, l, 0);
 	}
 	else
 	{
-		if (x == cursor_pos[cursor_now][0] && y == cursor_pos[cursor_now][1])
+		if (cursor_pos==cursor_now)
 		{
+
 			Text(x, y, l, 1);
 		}
 		else
@@ -523,24 +557,17 @@ void zui::ButtonText(int x, int y, char *l)//¹â±ê±ê×¢,×¢²áÑ¡Ïî,±£´æ¸÷¸ö¹â±êµÄ×ø±
 			Text(x, y, l, 0);
 		}
 	}
-}
-void copy(int* _Array, int* _Array1)
-{
-	for (int i = 0; i < 20; i++)
-	{
-		_Array1[i] = _Array[i];
-	}
+	cursor_pos++;
 }
 
-//Êı¾İ¸ü¸Ä¶Ô»°¿ò   number±»ĞŞ¸ÄµÄÊı¾İ£¬bÒª´òÓ¡³ö¼¸Î»Êı£¬Ê±ºòÎª¸¡µã£¬Ã¿50ms²½½ø³Ì¶È
+
+//Êı¾İ¸ü¸Ä¶Ô»°¿ò   number±»ĞŞ¸ÄµÄÊı¾İ£¬bÒª´òÓ¡³ö¼¸Î»Êı£¬ÊÇ·ñÎª¸¡µã£¬Ã¿Ò¡¸ËÑÓÊ±Ê±¼äµÄ²½½ø³Ì¶È
 void zui::MsgBox(double &number, int b, boolean float_num, float range)//numberÒªĞŞ¸ÄµÄÊı¾İ£¬bÊı¾İµÄÓĞĞ§ÊıÎ»£¬cÊÇ·ñ¸¡µãÊı£¬rangeÃ¿¸ô50ms±ä¶¯µÄ·ù¶È
 {//arduinoºÃÏñ²»ÄÜÓÃÄ£°å£¬ÌáÊ¾ error: 'T' was not declared in this scope
 	int cursor_now_0 = cursor_now;
 	int cursor_num_0 = cursor_num;
 	int page_now_0 = page_now;
-	int cursor_pos_0[20][2] ;
-	copy(cursor_pos[0], cursor_pos_0[0]);//ºÍcpp²»Ò»Ñù
-	copy(cursor_pos[1], cursor_pos_0[1]);
+	int cursor_pos_0 = cursor_pos;
 	//ÒÔÉÏ´úÂë±¸·İËùÓĞĞÅÏ¢
 	delay(10);
 	Clear();
@@ -555,20 +582,17 @@ void zui::MsgBox(double &number, int b, boolean float_num, float range)//numberÒ
 		{
 			number_temp += range;
 			Draw(12, 1, 60, 32, frame);
-			delay(50);
 		}
 		while(PS2VRXDown())
 		{
 			number_temp -= range;
 			Draw(12, 1, 60, 32, frame);
-			delay(50);
 		}
 		ButtonText(25, 4, "YES");
 		ButtonText(50, 4, "NO");
 		if (Click(0))//µÚ0¸ö°´Å¥°´ÏÂ
 		{//»¹Ô­ËùÓĞ×ø±êÎ»ÖÃĞÅÏ¢
-			copy(cursor_pos_0[0], cursor_pos[0]);
-			copy(cursor_pos_0[1], cursor_pos[1]);
+			cursor_pos = cursor_pos_0;
 			cursor_now = cursor_now_0;
 			cursor_num = cursor_num_0;
 			page_now = page_now_0;
@@ -579,8 +603,7 @@ void zui::MsgBox(double &number, int b, boolean float_num, float range)//numberÒ
 		}
 		if (Click(1))
 		{//»¹Ô­ËùÓĞ×ø±êÎ»ÖÃĞÅÏ¢
-			copy(cursor_pos_0[0], cursor_pos[0]);
-			copy(cursor_pos_0[1], cursor_pos[1]);
+			cursor_pos = cursor_pos_0;
 			cursor_now = cursor_now_0;
 			cursor_num = cursor_num_0;
 			page_now = page_now_0;
@@ -591,16 +614,14 @@ void zui::MsgBox(double &number, int b, boolean float_num, float range)//numberÒ
 		ReverseDisplayEnd();
 	}
 }
-//Êı¾İ¸ü¸Ä¶Ô»°¿ò   number±»ĞŞ¸ÄµÄÊı¾İ£¬bÒª´òÓ¡³ö¼¸Î»Êı£¬Ê±ºòÎª¸¡µã£¬Ã¿50ms²½½ø³Ì¶È
+//Êı¾İ¸ü¸Ä¶Ô»°¿ò   number±»ĞŞ¸ÄµÄÊı¾İ£¬bÒª´òÓ¡³ö¼¸Î»Êı£¬ÊÇ·ñÎª¸¡µã£¬Ã¿Ò¡¸ËÑÓÊ±Ê±¼äµÄ²½½ø³Ì¶È
 void zui::MsgBox(int &number, int b, boolean float_num, float range)//numberÒªĞŞ¸ÄµÄÊı¾İ£¬bÊı¾İµÄÓĞĞ§ÊıÎ»£¬cÊÇ·ñ¸¡µãÊı£¬rangeÃ¿¸ô50ms±ä¶¯µÄ·ù¶È
 {
 
 	int cursor_now_0 = cursor_now;
 	int cursor_num_0 = cursor_num;
 	int page_now_0 = page_now;
-	int cursor_pos_0[20][2];
-	copy(cursor_pos[0], cursor_pos_0[0]);//ºÍcpp²»Ò»Ñù
-	copy(cursor_pos[1], cursor_pos_0[1]);
+	int cursor_pos_0 = cursor_pos;
 	//ÒÔÉÏ´úÂë±¸·İËùÓĞĞÅÏ¢
 	delay(10);
 	Clear();
@@ -615,21 +636,18 @@ void zui::MsgBox(int &number, int b, boolean float_num, float range)//numberÒªĞŞ
 		{
 			number_temp += range;
 			Draw(12, 1, 60, 32, frame);
-			delay(50);
 		}
 		while (PS2VRXDown())
 		{
 			number_temp -= range;
 			Draw(12, 1, 60, 32, frame);
-			delay(50);
 		}
 		ButtonText(25, 4, "YES");
 		ButtonText(50, 4, "NO");
 		if (Click(0))//µÚ0¸ö°´Å¥°´ÏÂ
 		{
 			//»¹Ô­ËùÓĞ×ø±êÎ»ÖÃĞÅÏ¢
-			copy(cursor_pos_0[0], cursor_pos[0]);
-			copy(cursor_pos_0[1], cursor_pos[1]);
+			cursor_pos = cursor_pos_0;
 			cursor_now = cursor_now_0;
 			cursor_num = cursor_num_0;
 			page_now = page_now_0;
@@ -640,8 +658,7 @@ void zui::MsgBox(int &number, int b, boolean float_num, float range)//numberÒªĞŞ
 		}
 		if (Click(1))
 		{//»¹Ô­ËùÓĞ×ø±êÎ»ÖÃĞÅÏ¢
-			copy(cursor_pos_0[0], cursor_pos[0]);
-			copy(cursor_pos_0[1], cursor_pos[1]);
+			cursor_pos = cursor_pos_0;
 			cursor_now = cursor_now_0;
 			cursor_num = cursor_num_0;
 			page_now = page_now_0;
@@ -656,11 +673,15 @@ void zui::MsgBox(int &number, int b, boolean float_num, float range)//numberÒªĞŞ
 //Ò³Ãæ½áÊøÊ¹ÓÃ¼ıÍ·×÷Îª¹â±êÖ¸Ê¾
 void zui::ArrowEnd()
 {
-	if (!page_arrow)
+	if (!page_arrow||ui.PageSwitch())//´Óhome¼ü»ØÀ´Ê±Ò³ÃæÒÑ¾­Í¬²½µ«¹â±êÑùÊ½Ã»±ä£¬µÚÒ»´Î»æÍ¼»áÓĞ²ĞÁô£¬ËùÒÔĞèÒªÁ½¸ö
 	{
 		Clear();
 	}
 	page_arrow = true;//µ±Ç°Ò³ÃæÊÇ¼ıÍ·
+	if (page_now != 0 && page_now != 255) //Ö÷Ò³²»ĞèÒªhome¼ü
+	{
+		ButtonText(54, 5, "home");//»Ø¼Ò°´Å¥
+	}
 	if (PS2VRYUp())
 	{
 		cursor_now++;
@@ -679,29 +700,25 @@ void zui::ArrowEnd()
 		}
 		Clear();
 	}
-	if (cursor_now > -1 && cursor_now < cursor_num)//ÏŞ¶¨·¶Î§·ÀÖ¹·ÃÎÊµ½´íÎóµÄÄÚ´æ
-	{
-		Draw(cursor_pos[cursor_now][0], cursor_pos[cursor_now][1], 6, 8, cursor_arrow);
-	}
-	if (page_now != 0&& page_now !=255) //Ö÷Ò³²»ĞèÒªhome¼ü
-	{
-		ButtonText(54, 5, "home");//»Ø¼Ò°´Å¥
-	}
 	if (Click(cursor_num - 1))
 	{
-		page_now = 0;
+		ToPage(0);
 	}
-
+	cursor_pos = 0;
 	PageAsyc();
 }
 //Ò³Ãæ½áÊøÊ¹ÓÃ·´ÏÔ×÷Îª¹â±êÖ¸Ê¾
 void zui::ReverseDisplayEnd()//·´ÏÔÒÆ¶¯
 {
-	if (page_arrow)
+	if (page_arrow||ui.PageSwitch())
 	{
 		Clear();//Ê¹ÓÃ¼ıÍ·»áÈÃÕâ¸ö¿Ø¼şÍÆºó6ÏñËØ£¬ÒòÎª¿Ø¼şÊÇÏÈ»æÖÆÔÙÖ¸Ê¾¹â±êÑùÊ½£¬ËùÒÔÊ¹ÓÃ·´ÏÔµÄÊ±ºò¿ÉÄÜ»á²ĞÁô¼ıÍ·ÑùÊ½ÒÅÁôÏÂÀ´µÄ¼¸¸öÏñËØ£¬Ë¢ĞÂ¾ÍĞĞ
 	}
 	page_arrow = false;//µ±Ç°Ò³Ãæ²»ÊÇ¼ıÍ·
+	if (page_now != 0 && page_now != 255) //Ö÷Ò³£¬ÌáÊ¾¿ò²»ĞèÒªhome¼ü
+	{
+		ButtonText(60, 5, "home");
+	}
 	if (PS2VRYUp())
 	{
 		cursor_now++;
@@ -718,15 +735,20 @@ void zui::ReverseDisplayEnd()//·´ÏÔÒÆ¶¯
 			cursor_now = cursor_num - 1;
 		}
 	}
-	if (page_now != 0 &&page_now != 255) //Ö÷Ò³£¬ÌáÊ¾¿ò²»ĞèÒªhome¼ü
-	{
-		ButtonText(60, 5, "home");
-	}
+	cursor_pos = 0;
 	if (Click(cursor_num - 1))
 	{
-		page_now = 0;
+		ToPage(0);
 	}
-	PageAsyc();
+	if (sync)
+	{
+		PageAsyc();
+	}
+	else
+	{
+		sync = true;
+	}
+	
 }
 
 
@@ -771,4 +793,13 @@ void zui::PageAsyc()
 boolean zui::PageSwitch()
 {
 	return page_last != page_now;
+}
+//µ½ÁíÒ»¸öÒ³Ãæ _pageÒªµ½Ò³ÃæµÄÒ³Ãæ±àºÅ
+void zui::ToPage(int _page)
+{
+	PageAsyc();
+	SetPage(_page);
+	Clear();
+
+	//sync = false;//²»ÔÚend½øĞĞÍ¬²½
 }
