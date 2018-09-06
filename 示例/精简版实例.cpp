@@ -28,7 +28,7 @@ void UI()
 		break;
 	}
 }
-boolean led_open = false;
+boolean led_open = false;//led灯状态
 void home()
 {
 	ui.Text(0, 0, "This a led");
@@ -61,15 +61,22 @@ void home()
 }
 void timer()
 {
-	//ui.Text(0, 0, "this is");
-	//ui.Text(0, 1, "timer page");
+	ui.Text(0, 0, "this is");
+	ui.Text(0, 1, "timer page");
 	ui.ReverseDisplayEnd();
 }
+int bright_num = 100;//亮度
 void brightness()
 {
 	ui.Text(0, 0, "this is");
 	ui.Text(0, 1, "brightness");
 	ui.Text(0, 2, "page");
+	ui.Var(40, 3, bright_num, 3);//实时刷新
+	ui.ButtonText(0, 4, "click me");
+	if (ui.Click(0))//第0个按键按下
+	{
+		ui.MsgBox(bright_num, 3, 0, 10);//弹出个修改框来修改亮度
+	}
 	ui.ReverseDisplayEnd();
 }
 void setup()
@@ -82,5 +89,4 @@ void setup()
 void loop()
 {
 	UI();//启动界面
-	Serial.println(ui.GetCursorNum());
 }

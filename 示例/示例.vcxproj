@@ -77,7 +77,7 @@
     <DebuggerFlavor>VisualMicroDebugger</DebuggerFlavor>
   </PropertyGroup>
   <ItemGroup>
-    <None Include="完整示例.ino">
+    <None Include="完整示例.cpp">
       <FileType>CppCode</FileType>
     </None>
   </ItemGroup>

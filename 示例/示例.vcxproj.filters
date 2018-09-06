@@ -15,9 +15,9 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <None Include="完整示例.ino" />
+    <ClCompile Include="精简版实例.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="精简版实例.cpp" />
+    <None Include="完整示例.cpp" />
   </ItemGroup>
 </Project>

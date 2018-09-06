@@ -485,19 +485,12 @@ boolean zui::Click(int button_now)
 //±äÁ¿°´Å¥    xy×ø±ê£¬number±äÁ¿£¬bÒª´òÓ¡³ö¶àÉÙÎ»£¬float_numberÊÇ·ñÎª¸¡µãÊı
 void zui::ButtonVar(int x, int y, double number, int b, boolean float_number = 0) //¹â±ê±ê×¢,×¢²áÑ¡Ïî,±£´æ¸÷¸ö¹â±êµÄ×ø±ê
 {
-	if (PageSwitch())//ÇĞ»»ÁËÒ³Ãæ
+	if (first_record == 0)//Ê×´Î¼ÇÂ¼ĞèÒª½«¹â±êÊıÁ¿ÖÃ0
 	{
-		if (first_record == 0)//Ê×´Î¼ÇÂ¼ĞèÒª½«¹â±êÊıÁ¿ÖÃ0
-		{
-			cursor_num = 0;
-			first_record = 1;
-		}
-		cursor_num++;
+		cursor_num = 0;
+		first_record = 1;
 	}
-	else
-	{
-		first_record = 0;
-	}
+	cursor_num++;
 	if (page_arrow)//Èç¹ûÕâ¸öÒ³ÃæÊ¹ÓÃµÄÊÇ¼ıÍ·×÷Îª¹â±ê±êÊ¶
 	{
 		if (cursor_now == cursor_pos)
@@ -523,19 +516,12 @@ void zui::ButtonVar(int x, int y, double number, int b, boolean float_number = 0
 //ÎÄ±¾°´Å¥    xy×ø±ê£¬l×Ö·û´®
 void zui::ButtonText(int x, int y, char *l)//¹â±ê±ê×¢,×¢²áÑ¡Ïî,±£´æ¸÷¸ö¹â±êµÄ×ø±ê
 {
-	if (PageSwitch())
+	if (first_record == 0)//Ê×´Î¼ÇÂ¼ĞèÒª½«¹â±êÊıÁ¿ÖÃ0
 	{
-		if (first_record == 0)//Ê×´Î¼ÇÂ¼ĞèÒª½«¹â±êÊıÁ¿ÖÃ0
-		{
-			cursor_num = 0;
-			first_record = 1;
-		}
-		cursor_num++;
+		cursor_num = 0;
+		first_record = 1;
 	}
-	else
-	{
-		first_record = 0;
-	}
+	cursor_num++;
 	if (page_arrow)
 	{
 		if (cursor_now==cursor_pos)
@@ -580,12 +566,12 @@ void zui::MsgBox(double &number, int b, boolean float_num, float range)//numberÒ
 		Var(30, 2, number_temp, b, float_num);
 		while (PS2VRXUp())
 		{
-			number_temp += range;
+			number_temp -= range;
 			Draw(12, 1, 60, 32, frame);
 		}
 		while(PS2VRXDown())
 		{
-			number_temp -= range;
+			number_temp += range;
 			Draw(12, 1, 60, 32, frame);
 		}
 		ButtonText(25, 4, "YES");
@@ -634,12 +620,12 @@ void zui::MsgBox(int &number, int b, boolean float_num, float range)//numberÒªĞŞ
 		Var(30, 2, number_temp, b, float_num);
 		while (PS2VRXUp())
 		{
-			number_temp += range;
+			number_temp -= range;
 			Draw(12, 1, 60, 32, frame);
 		}
 		while (PS2VRXDown())
 		{
-			number_temp -= range;
+			number_temp += range;
 			Draw(12, 1, 60, 32, frame);
 		}
 		ButtonText(25, 4, "YES");
@@ -704,6 +690,7 @@ void zui::ArrowEnd()
 	{
 		ToPage(0);
 	}
+	first_record = 0;
 	cursor_pos = 0;
 	PageAsyc();
 }
@@ -718,6 +705,10 @@ void zui::ReverseDisplayEnd()//·´ÏÔÒÆ¶¯
 	if (page_now != 0 && page_now != 255) //Ö÷Ò³£¬ÌáÊ¾¿ò²»ĞèÒªhome¼ü
 	{
 		ButtonText(60, 5, "home");
+	}
+	if (Click(cursor_num - 1))
+	{
+		ToPage(0);
 	}
 	if (PS2VRYUp())
 	{
@@ -735,19 +726,9 @@ void zui::ReverseDisplayEnd()//·´ÏÔÒÆ¶¯
 			cursor_now = cursor_num - 1;
 		}
 	}
+	first_record = 0;
 	cursor_pos = 0;
-	if (Click(cursor_num - 1))
-	{
-		ToPage(0);
-	}
-	if (sync)
-	{
-		PageAsyc();
-	}
-	else
-	{
-		sync = true;
-	}
+	PageAsyc();
 	
 }
 
@@ -800,6 +781,5 @@ void zui::ToPage(int _page)
 	PageAsyc();
 	SetPage(_page);
 	Clear();
-
-	//sync = false;//²»ÔÚend½øĞĞÍ¬²½
+	sync = false;//²»ÔÚend½øĞĞÍ¬²½
 }
