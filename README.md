@@ -1,7 +1,9 @@
 关于zui2
 #
+
 项目简介
 ##
+
   这是一个是基于Arduino和lcd5110的操作界面，使用ps2摇杆进行对光标的控制，开源
 目的是为了让开发者在一些小型项目上提高开发速度以及吸引初学者来继续深入Arduino或者其它
 语言及平台。<br>
@@ -11,6 +13,7 @@
 
 功能特性
 ##
+
 * 使用取模到的数据绘图
 * 显示文本
 * 显示实时刷新的数值
@@ -21,9 +24,13 @@
 
 两个例子的主页效果预览
 ##
+
 完整版
 ####
+
 ![](https://wx2.sinaimg.cn/mw690/006MXaBkgy1fv1hnp61ayj30zg0zkhdt.jpg )
+
 精简版
 ####
+
 ![](https://wx1.sinaimg.cn/mw690/006MXaBkgy1fv1ho1nj5ej31kk1kkb2c.jpg )
