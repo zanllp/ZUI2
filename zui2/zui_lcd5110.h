@@ -78,7 +78,7 @@ public:
 	//设置当前页面的光标数量
 	int SetCursorNum(int _cursor_num);
 	//页面同步  放在页面尾部，有那两个end（）的时候不需要手动设置
-	void PageAsyc();
+	void PageSync();
 	//如果切换了页面    返回ture
 	boolean PageSwitch();
 	//到另一个页面 _page要到页面的页面编号

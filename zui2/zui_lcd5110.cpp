@@ -5,6 +5,7 @@
 #include "zui_lcd5110.h"
 
 #include <avr/pgmspace.h>
+
 int zui::RST;
 int zui::CE;
 int zui::DC;
@@ -582,7 +583,7 @@ void zui::MsgBox(double &number, int b, boolean float_num, float range)//numberÒ
 			cursor_now = cursor_now_0;
 			cursor_num = cursor_num_0;
 			page_now = page_now_0;
-			PageAsyc();
+			PageSync();
 			Clear();
 			number = number_temp;
 			break;
@@ -593,7 +594,7 @@ void zui::MsgBox(double &number, int b, boolean float_num, float range)//numberÒ
 			cursor_now = cursor_now_0;
 			cursor_num = cursor_num_0;
 			page_now = page_now_0;
-			PageAsyc();
+			PageSync();
 			Clear();
 			break;
 		}
@@ -637,7 +638,7 @@ void zui::MsgBox(int &number, int b, boolean float_num, float range)//numberÒªĞŞ
 			cursor_now = cursor_now_0;
 			cursor_num = cursor_num_0;
 			page_now = page_now_0;
-			PageAsyc();
+			PageSync();
 			number = number_temp;
 			Clear();
 			break;
@@ -648,7 +649,7 @@ void zui::MsgBox(int &number, int b, boolean float_num, float range)//numberÒªĞŞ
 			cursor_now = cursor_now_0;
 			cursor_num = cursor_num_0;
 			page_now = page_now_0;
-			PageAsyc();
+			PageSync();
 			Clear();
 			break;
 		}
@@ -692,7 +693,15 @@ void zui::ArrowEnd()
 	}
 	first_record = 0;
 	cursor_pos = 0;
-	PageAsyc();
+	if (sync)//ÔÚÒ³ÃæÌø×ªºó£¬ÔÚend()´¦²»½øĞĞÍ¬²½£¬ÕâÑù²ÅÄÜÖªµÀÒ³ÃæÊÇ·ñÓĞÇĞ»»
+	{
+		PageSync();
+	}
+	else
+	{
+		sync = true;
+	}
+
 }
 //Ò³Ãæ½áÊøÊ¹ÓÃ·´ÏÔ×÷Îª¹â±êÖ¸Ê¾
 void zui::ReverseDisplayEnd()//·´ÏÔÒÆ¶¯
@@ -728,7 +737,15 @@ void zui::ReverseDisplayEnd()//·´ÏÔÒÆ¶¯
 	}
 	first_record = 0;
 	cursor_pos = 0;
-	PageAsyc();
+	if (sync)//ÔÚÒ³ÃæÌø×ªºó£¬ÔÚend()´¦²»½øĞĞÍ¬²½£¬ÕâÑù²ÅÄÜÖªµÀÒ³ÃæÊÇ·ñÓĞÇĞ»»
+	{
+		PageSync();
+	}
+	else
+	{
+		sync = true;
+	}
+
 	
 }
 
@@ -766,7 +783,7 @@ int zui::SetCursorNum(int _cursor_num)
 	cursor_num = _cursor_num;
 }
 //Ò³ÃæÍ¬²½  ·ÅÔÚÒ³ÃæÎ²²¿£¬ÓĞÄÇÁ½¸öend£¨£©µÄÊ±ºò²»ĞèÒªÊÖ¶¯ÉèÖÃ
-void zui::PageAsyc()
+void zui::PageSync()
 {
 	page_last = page_now;
 }
@@ -778,8 +795,8 @@ boolean zui::PageSwitch()
 //µ½ÁíÒ»¸öÒ³Ãæ _pageÒªµ½Ò³ÃæµÄÒ³Ãæ±àºÅ
 void zui::ToPage(int _page)
 {
-	PageAsyc();
+	PageSync();
 	SetPage(_page);
 	Clear();
-	sync = false;//²»ÔÚend½øĞĞÍ¬²½
+	sync = false;//²»ÔÚend£¨£©½øĞĞÍ¬²½
 }
