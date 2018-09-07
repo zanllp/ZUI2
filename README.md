@@ -16,7 +16,7 @@
 * 支持使用反显或箭头的光标样式来指示光标的位置
 * 支持多个页面任意切换 
 ##两个例子的主页效果预览
-####完整版
+###完整版
 ![](https://wx2.sinaimg.cn/mw690/006MXaBkgy1fv1hnp61ayj30zg0zkhdt.jpg )
-####精简版
+###精简版
 ![](https://wx1.sinaimg.cn/mw690/006MXaBkgy1fv1ho1nj5ej31kk1kkb2c.jpg )
