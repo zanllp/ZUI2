@@ -32,5 +32,5 @@
 
 更多
 ---
-[csdn文档](https://blog.csdn.net/zanllp/article/details/82560034)
-[b站示例效果视频](https://blog.csdn.net/zanllp/article/details/82560034)
+[csdn文档](https://blog.csdn.net/zanllp/article/details/82560034)    
+[b站示例效果视频](https://www.bilibili.com/video/av31371039)
