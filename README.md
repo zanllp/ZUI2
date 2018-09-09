@@ -24,8 +24,13 @@
 两个例子的主页效果预览
 ---
 
-###完整版<br>
+完整版<br>
 ![](https://wx2.sinaimg.cn/mw690/006MXaBkgy1fv1hnp61ayj30zg0zkhdt.jpg )
 
-###精简版<br>
+精简版<br>
 ![](https://wx1.sinaimg.cn/mw690/006MXaBkgy1fv1ho1nj5ej31kk1kkb2c.jpg )
+
+更多
+---
+[csdn文档](https://blog.csdn.net/zanllp/article/details/82560034)
+[b站示例效果视频](https://blog.csdn.net/zanllp/article/details/82560034)
